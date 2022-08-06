@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 public class GikoIdolPlayerData
 {
-    public int traitsInput;
     public List<string> traits;
     public byte[] canvas;
     public string idolName;

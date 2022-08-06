@@ -39,7 +39,7 @@ public class GikoIdolStage_Draw : Stage
     }
 
     private void startTimer(){
-        this.timeLeft = Constants.TIMER_DRAW;
+        this.timeLeft = Settings.TIMER_DRAW;
         this.timerBackground.SetActive(true);
         this.timerBackground.transform.localScale = new Vector3(0f, 0f, 0f);
         LeanTween.scale(this.timerBackground, new Vector3(1,1,1), 2f).setEase(LeanTweenType.easeOutQuart);
@@ -61,10 +61,6 @@ public class GikoIdolStage_Draw : Stage
     IEnumerator scriptwriter()
     {
         this.text.fadeIn();
-
-        foreach(Player p in this.game.players){
-            this.game.playerData[p].avatar.hideScore();
-        }
 
         LeanTween.scale(this.shii, new Vector3(1,1,1), 3f).setEase(LeanTweenType.easeInBounce);
 
@@ -103,30 +99,39 @@ public class GikoIdolStage_Draw : Stage
     }
 
     public void sendTraits(){
+
+
+        // Shuffle reserve list
+        var random = new System.Random();
+        List<string> usableReserve = new List<string>();
+        foreach (string prompt in this.game.reserveTraits){
+            usableReserve.Insert(random.Next(0, usableReserve.Count + 1), prompt);
+        }
+
+
          // Send 3 random traits
         List<string> availableTraits = this.game.traits.ToList();
         if (availableTraits.Count < this.game.players.Count * 3){
             // Add traits from the list we already have
             int missingTraits = (this.game.players.Count * 3) - availableTraits.Count;
             for (int i = 0; i < missingTraits; i++){
-                availableTraits.Add(this.game.reserveTraits[i]);
+                availableTraits.Add(usableReserve[i]);
             }
         }
-        var random = new System.Random();
-        foreach(Player p in this.game.players){
+        for (int i = 0; i < this.game.players.Count; i++){
             
             dynamic traitMessage = new JObject();
             traitMessage.key = this.game.key;
             traitMessage.room = this.game.room;
             traitMessage.type = WsMessage.TARGETEDGAMEMESSAGE;
-            traitMessage.player = p.key;
+            traitMessage.player = this.game.players[i].key;
             traitMessage.message = new JArray();
 
-            for (int i = 0; i < 3; i++){
+            for (int j = 0; j < 3; j++){
                 int index = random.Next(availableTraits.Count);
-                this.game.playerData[p].traits.Add(availableTraits[index]);
+                this.game.idols[i].traits.Add(availableTraits[index]);
+                this.game.playerData[this.game.players[i]].traits.Add(availableTraits[index]);
                 traitMessage.message.Add(availableTraits[index]);
-                Debug.Log("Picked trait : " + availableTraits[index] + " for player " + p.name);
                 availableTraits.RemoveAt(index);
             }
 

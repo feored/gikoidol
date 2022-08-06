@@ -9,8 +9,6 @@ using System.Text;
 
 public class GikoIdol : GikoboxGame
 {
-    string gameName = "GikoIdol";
-
     public List<string> traits;
 
     public List<string> reserveTraits;
@@ -23,12 +21,14 @@ public class GikoIdol : GikoboxGame
 
     public Dictionary<Player, GikoIdolPlayerData> playerData;
 
+    public List<IdolData> idols;
+
     // Start is called before the first frame update
     public override void Start()
     {
 
 
-        this.minPlayers = 2;
+        this.minPlayers = 1;
         this.maxPlayers = 8;
 
 
@@ -45,6 +45,9 @@ public class GikoIdol : GikoboxGame
             "Message just in case there aren't enough #9",
         };
         this.playerData = new Dictionary<Player, GikoIdolPlayerData>();
+
+        this.idols = new List<IdolData>();
+
         base.Start();
         
     }
@@ -80,6 +83,7 @@ public class GikoIdol : GikoboxGame
         if (this.players.Count >= this.minPlayers){
             this.makeGameStartable();
         }
+        this.idols.Add(new IdolData());
         StartCoroutine(addPlayerSidebar(newPlayer));
     }
 
@@ -89,11 +93,11 @@ public class GikoIdol : GikoboxGame
         gikoAvatar.transform.SetParent(gikoPlayerContainer.transform);
         gikoAvatar.transform.localScale = new Vector3(1,1,1);
         GikoPlayer gp = gikoAvatar.GetComponent<GikoPlayer>();
-        gp.hideScore();
-        gp.hideCheckmark();
         gp.setName(p.name);
         this.playerData[p].avatar = gp;
         LeanTween.alphaCanvas (gikoAvatar.GetComponent<CanvasGroup>(), 1f, 1f);
+        // Play login sound
+        FMODUnity.RuntimeManager.PlayOneShot("event:/login");
 
         // Send list of avatars
         dynamic avatarMessage = new JObject();

@@ -29,7 +29,7 @@ public class GikoIdolStage_Specs : Stage
     }
 
     private void startTimer(){
-        this.timeLeft = Constants.TIMER_SPECS;
+        this.timeLeft = Settings.TIMER_SPECS;
         this.timerBackground.SetActive(true);
         this.timerBackground.transform.localScale = new Vector3(0f, 0f, 0f);
         LeanTween.scale(this.timerBackground, new Vector3(1,1,1), 2f).setEase(LeanTweenType.easeOutQuart);
@@ -47,9 +47,6 @@ public class GikoIdolStage_Specs : Stage
 
     IEnumerator scriptwriter()
     {
-        foreach(Player p in this.game.players){
-            this.game.playerData[p].avatar.showScore();
-        }
 
         this.game.loadNewPage("GikoIdolSpecs");
 
@@ -105,8 +102,8 @@ public class GikoIdolStage_Specs : Stage
         Player p = this.game.getPlayer(message.key);
         this.game.traits.Add(receivedTrait);
 
-        this.game.playerData[p].traitsInput++;
-        this.game.playerData[p].avatar.setScore(this.game.playerData[p].traitsInput);
+        this.game.playerData[p].avatar.shake();
+        this.game.playerData[p].avatar.addPrompt();
     }
 
 }

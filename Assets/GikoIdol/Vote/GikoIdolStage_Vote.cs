@@ -27,14 +27,14 @@ public class GikoIdolStage_Vote : Stage
     public override void Start()
     {
         this.timer = false;
-        this.timeLeft = Constants.TIMER_VOTE;
+        this.timeLeft = Settings.TIMER_VOTE;
         foreach(Player p in this.game.players){
             this.game.playerData[p].avatar.highlight(false);
         }
     }
 
     private void startTimer(){
-        this.timeLeft = Constants.TIMER_VOTE;
+        this.timeLeft = Settings.TIMER_VOTE;
         this.timerBackground.SetActive(true);
         this.timerBackground.transform.localScale = new Vector3(0f, 0f, 0f);
         LeanTween.scale(this.timerBackground, new Vector3(1,1,1), 2f).setEase(LeanTweenType.easeOutQuart);
@@ -56,10 +56,6 @@ public class GikoIdolStage_Vote : Stage
         this.text.setText("Vote for the best idol!");
 
         this.text.fadeIn();
-
-        foreach(Player p in this.game.players){
-            this.game.playerData[p].avatar.hideScore();
-        }
 
         // We wait here to make sure loadpage
         // has been received before sending the vote

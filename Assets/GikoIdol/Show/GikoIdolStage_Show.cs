@@ -11,6 +11,16 @@ using UnityEngine.UI;
 
 public class GikoIdolStage_Show : Stage
 {
+
+    [SerializeField]
+    private GameObject glowstickSpawn;
+
+    [SerializeField]
+    private GameObject glowstickPrefab;
+
+    [SerializeField]
+    private GameObject textFloatingPrefab;
+
     [SerializeField]
     private GikoidolText text;
 
@@ -37,6 +47,8 @@ public class GikoIdolStage_Show : Stage
     private Vector3 IdolPosition = new Vector3(-15, 35, 0);
 
     private Player currentPlayer;
+
+    private bool jumping = false;
 
     // Start is called before the first frame update
     public override void Start()
@@ -65,11 +77,6 @@ public class GikoIdolStage_Show : Stage
 
         this.text.fadeIn();
 
-        foreach(Player p in this.game.players)
-        {
-            this.game.playerData[p].avatar.hideScore();
-        }
-
 
         //LeanTween.scale(this.shii, new Vector3(1,1,1), 3f).setEase(LeanTweenType.easeInBounce);
 
@@ -84,19 +91,21 @@ public class GikoIdolStage_Show : Stage
         // giving each player a chance to show dance/text
         foreach(Player p in this.game.players)
         {
+            this.currentPlayer = p;
+            this.jumping = false;
             this.highlightCorrectNameplate(p);
             showIdol(p);
             yield return new WaitForSeconds(1.0f);
+            this.dispatchRightPage(p);
             int i = 0;
             foreach (string trait in this.game.playerData[p].traits){
                 setTrait(trait, i);
                 i++;
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(0.25f);
             }
-            this.currentPlayer = p;
-            yield return new WaitForSeconds(Constants.SHOW_DURATION);
+            yield return new WaitForSeconds(Settings.SHOW_DURATION);
             hideIdol();
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(0.5f);
         }
 
         this.game.loadNewPage("empty");
@@ -104,14 +113,21 @@ public class GikoIdolStage_Show : Stage
         
     }
 
+    public void dispatchRightPage(Player p){
+        for (int i = 0; i < this.game.players.Count; i++){
+            if (this.game.players[i] == p){
+                this.game.loadNewPageSpecificPlayer("GikoIdolShow", p);
+            } else {
+                this.game.loadNewPageSpecificPlayer("GikoIdolShowSpectator", this.game.players[i]);
+            }
+        }
+    }
+
     public void highlightCorrectNameplate(Player p){
         foreach(Player pp in this.game.players){
             var highlight = false;
             if (pp == p){
                 highlight = true;
-                this.game.loadNewPage("GikoIdolShow");
-            } else {
-                this.game.loadNewPage("GikoIdolShowSpectator");
             }
             this.game.playerData[pp].avatar.highlight(highlight);
         }
@@ -133,15 +149,24 @@ public class GikoIdolStage_Show : Stage
         
     }
 
+    public void startJumping(){
+        this.jumping = true;
+    }
+    public void stopJumping(){
+        this.jumping = false;
+    }
+
 
     public void showIdol(Player p){
+        this.jumping = false;
         this.flipped = false;
         Texture2D tex = new Texture2D(2, 2);
         tex.LoadImage( this.game.playerData[p].canvas);
         Sprite sprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.5f, 0.5f), 100.0f);
         this.gikoDrawing.sprite = sprite;
         this.gikoDrawing.transform.position = new Vector3(-1080, 35, 0);
-        LeanTween.moveX(this.gikoDrawing.GetComponent<RectTransform>(), IdolPosition.x, 2f).setEase(LeanTweenType.easeOutQuart);
+        LeanTween.cancel(this.gikoDrawing.gameObject);
+        LeanTween.moveX(this.gikoDrawing.GetComponent<RectTransform>(), IdolPosition.x, 1f).setEase(LeanTweenType.easeOutQuart);
         this.idolName.setText(this.game.playerData[p].idolName);
         this.idolName.fadeIn();
     }
@@ -164,20 +189,48 @@ public class GikoIdolStage_Show : Stage
         flipped = !flipped;
     }
 
+    public void gikoTalk(string talk){ 
+        GameObject floatingTextGO = Instantiate(this.textFloatingPrefab, this.gikoDrawing.gameObject.transform.position, Quaternion.identity, this.gameObject.transform);
+        floatingTextGO.transform.position = new Vector3(this.gikoDrawing.gameObject.transform.position.x, this.gikoDrawing.gameObject.transform.position.y + 300, this.gikoDrawing.gameObject.transform.position.z);
+        floatingTextGO.transform.localScale = new Vector3(1,1,1);
+        FloatingAwayText fat = floatingTextGO.GetComponent<FloatingAwayText>();
+        fat.setText(talk);
+        fat.setFontSize(32);
+        fat.startFloating(300f, 4f);
+    }
+
     public void gikoMove(string direction){
         LeanTween.cancel(this.gikoDrawing.gameObject);
-        float curRotation = this.gikoDrawing.GetComponent<RectTransform>().eulerAngles.y;
         LeanTween.moveX(this.gikoDrawing.GetComponent<RectTransform>(), this.gikoDrawing.GetComponent<RectTransform>().anchoredPosition.x + (direction == "left" ? -50 : 50), 0.5f).setEase(LeanTweenType.easeOutQuart);
     }
 
+    public void gikoJump(){
+        LeanTween.cancel(this.gikoDrawing.gameObject);
+        LeanTween.moveY(this.gikoDrawing.GetComponent<RectTransform>(), this.gikoDrawing.GetComponent<RectTransform>().anchoredPosition.y + 50, 0.25f).setLoopPingPong(1).setEase(LeanTweenType.easeOutCirc).setOnStart(startJumping).setOnComplete(stopJumping);
+    }
+
     public void hideIdol(){
+        LeanTween.cancel(this.gikoDrawing.gameObject);
         LeanTween.moveX(this.gikoDrawing.GetComponent<RectTransform>(), 1080f, 3f).setEase(LeanTweenType.easeOutQuart);
         this.removeTraits();
         this.idolName.fadeOut();
     }
 
+    public void cheer(){
+        if (Random.value > 0.66f){
+            spawnGlowstick();
+        }
+    }
+
+    public void spawnGlowstick(){
+        GameObject glowstickGO = Instantiate(this.glowstickPrefab, new Vector3(0, 0, 0), Quaternion.identity, this.glowstickSpawn.transform);
+        glowstickGO.transform.position = new Vector3( this.glowstickSpawn.transform.position.x + Random.Range(-25f, 25f),  this.glowstickSpawn.transform.position.y + Random.Range(-25f, 25f),  this.glowstickSpawn.transform.position.z);
+        glowstickGO.transform.localScale = new Vector3(1,1,1);
+        Glowstick glowstick = glowstickGO.GetComponent<Glowstick>();
+        glowstick.startFloating(250f+ Random.Range(-25f, 25f), 25f + Random.Range(-10f, 10f), 2f);
+    }
+
     public override void Init(){
-        this.currentPlayer = null;
         this.timer = false;
         foreach(Player p in this.game.players){
             this.game.playerData[p].avatar.highlight(false);
@@ -202,7 +255,7 @@ public class GikoIdolStage_Show : Stage
         
         // Check that commands are coming from main player currently
 
-        if (currentPlayer != null && message.key == currentPlayer.key){
+        if (currentPlayer != null && message.key == currentPlayer.key && !jumping){
             switch(command){
                 case "flip":
                     gikoFlip();
@@ -210,6 +263,16 @@ public class GikoIdolStage_Show : Stage
                 case "move":
                     string direction = d.message.direction;
                     gikoMove(direction);
+                    break;
+                case "talk":
+                    string content = d.message.content;
+                    gikoTalk(content);
+                    break;
+                case "jump":
+                    gikoJump();
+                    break;
+                case "cheer":
+                    cheer();
                     break;
             }
         }

@@ -10,6 +10,9 @@ public class GikoPlayer : MonoBehaviour
     private Color32 REGULAR_BACKGROUND = new Color32(0,0,0,143);
 
     [SerializeField]
+    private GameObject textFloatingPrefab;
+
+    [SerializeField]
     private TextMeshProUGUI name;
 
     [SerializeField]
@@ -37,29 +40,21 @@ public class GikoPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //this.hideScore();
+        LeanTween.scale(this.avatar.GetComponent<RectTransform>(), new Vector3(1.05f, 1.05f, 1.05f), 1.5f).setEase(LeanTweenType.easeInOutSine).setLoopPingPong();
     }
 
-    public void showScore(){
-        this.scoreBackground.SetActive(true);
+    public void shake(){
+        LeanTween.cancel(this.gameObject);
+        LeanTween.scale(this.gameObject, new Vector3(1.15f, 1.15f, 1.15f), 0.25f).setEaseShake();
     }
 
-    public void hideScore(){
-        this.scoreBackground.SetActive(false);
+    public void addPrompt(){
+        GameObject floatingTextGO = Instantiate(this.textFloatingPrefab, this.gameObject.transform);
+        floatingTextGO.transform.localScale = new Vector3(1,1,1);
+        FloatingAwayText fat = floatingTextGO.GetComponent<FloatingAwayText>();
+        fat.setText("+1");
+        fat.startFloating(100f, 3f);
     }
-
-    public void setScore(int newScore){
-        this.scoreText.text = newScore.ToString();
-    }
-
-    public void showCheckmark(){
-        this.checkmark.SetActive(true);
-    }
-
-    public void hideCheckmark(){
-        this.checkmark.SetActive(false);
-    }
-
     public void highlight(bool highlight){
         this.GetComponent<Image>().color = highlight ? HIGHLIGHTED_BACKGROUND : REGULAR_BACKGROUND;
     }
