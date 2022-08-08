@@ -80,7 +80,7 @@ public class GikoIdolStage_Show : Stage
 
         //LeanTween.scale(this.shii, new Vector3(1,1,1), 3f).setEase(LeanTweenType.easeInBounce);
 
-        this.game.loadNewPage("GikoIdolShowSpectator");
+        this.game.loadNewPage("empty");
 
         this.text.fadeOut();
         this.text.gameObject.SetActive(false);
@@ -115,8 +115,8 @@ public class GikoIdolStage_Show : Stage
 
     public void dispatchRightPage(Player p){
         for (int i = 0; i < this.game.players.Count; i++){
-            if (this.game.players[i] == p){
-                this.game.loadNewPageSpecificPlayer("GikoIdolShow", p);
+            if (this.game.players[i].key == p.key){
+                this.game.loadNewPageSpecificPlayer("GikoIdolShow", this.game.players[i]);
             } else {
                 this.game.loadNewPageSpecificPlayer("GikoIdolShowSpectator", this.game.players[i]);
             }

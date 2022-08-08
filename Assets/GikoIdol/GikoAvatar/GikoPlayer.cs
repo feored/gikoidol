@@ -54,6 +54,7 @@ public class GikoPlayer : MonoBehaviour
         FloatingAwayText fat = floatingTextGO.GetComponent<FloatingAwayText>();
         fat.setText("+1");
         fat.startFloating(100f, 3f);
+        FMODUnity.RuntimeManager.PlayOneShot("event:/btn");
     }
     public void highlight(bool highlight){
         this.GetComponent<Image>().color = highlight ? HIGHLIGHTED_BACKGROUND : REGULAR_BACKGROUND;

@@ -16,13 +16,13 @@ public class GikoidolText : MonoBehaviour
     public void fadeOut(){
         var fadeoutcolor = this.text.faceColor;
         fadeoutcolor.a = 0;
-        LeanTween.value(gameObject, updateValueExampleCallback, this.text.faceColor, fadeoutcolor, 1f).setEase(LeanTweenType.easeInCirc);
+        LeanTween.value(gameObject, updateValueExampleCallback, this.text.faceColor, fadeoutcolor, 0.5f).setEase(LeanTweenType.easeInCirc);
     }
 
     public void fadeIn(){
         var fadeinColor = this.text.faceColor;
         fadeinColor.a = 255;
-        LeanTween.value(gameObject, updateValueExampleCallback, this.text.faceColor, fadeinColor, 1f).setEase(LeanTweenType.easeInCirc);
+        LeanTween.value(gameObject, updateValueExampleCallback, this.text.faceColor, fadeinColor, 0.5f).setEase(LeanTweenType.easeInCirc);
     }
 
     public void instantFadeOut(){
@@ -30,7 +30,7 @@ public class GikoidolText : MonoBehaviour
     }
 
     public void instantFadeIn(){
-        this.text.faceColor = new Color(this.text.faceColor.r, this.text.faceColor.g, this.text.faceColor.b, 1f);
+        this.text.faceColor = new Color(this.text.faceColor.r, this.text.faceColor.g, this.text.faceColor.b, 0f);
     }
 
     public void changeText(string newText){

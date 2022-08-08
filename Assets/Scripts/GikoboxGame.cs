@@ -142,7 +142,7 @@ public abstract class GikoboxGame : MonoBehaviour
     }
 
     public virtual void loadNewPageSpecificPlayer(string newPage, Player p){
-        WsSimpleMessage sendNewPage = new WsSimpleMessage(this.key, WsMessage.LOADPAGE, this.room, p.key, newPage);
+        WsSimpleMessage sendNewPage = new WsSimpleMessage(this.key, WsMessage.LOADPAGESPECIFIC, this.room, p.key, newPage);
         connection.wsSendMessage(JsonConvert.SerializeObject(sendNewPage));
     }
 

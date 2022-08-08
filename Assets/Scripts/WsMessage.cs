@@ -12,6 +12,7 @@ public class WsMessage
     public const string GAMESTART = "game-start";
     public const string GAMESTARTABLE = "GAMESTARTABLE";
     public const string LOADPAGE = "LOADPAGE";
+    public const string LOADPAGESPECIFIC = "LOADPAGESPECIFIC";
     public const string TARGETEDGAMEMESSAGE = "TARGETEDGAMEMESSAGE";
     public const string DELETEROOM = "DELETEROOM";
 
