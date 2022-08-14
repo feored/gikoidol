@@ -58,8 +58,16 @@ public class GikoIdol : GikoboxGame
     }
 
     public override void createRoom(){
-        WsSimpleMessage createRoomMessage = new WsSimpleMessage("", WsMessage.CREATEROOM, "", "", "GikoIdol");
-        connection.wsSendMessage(JsonConvert.SerializeObject(createRoomMessage));
+        dynamic createRoomMessage = new JObject();
+        createRoomMessage.key = "";
+        createRoomMessage.room = "";
+        createRoomMessage.type = WsMessage.CREATEROOM;
+        createRoomMessage.player = "";
+        createRoomMessage.message = new JObject();
+        createRoomMessage.message.maxPlayers = 8;
+        createRoomMessage.message.gameName = "GikoIdol";
+        
+        connection.wsSendMessage(createRoomMessage.ToString());
     }
 
     public override void startGame(){

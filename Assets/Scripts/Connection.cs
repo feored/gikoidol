@@ -20,7 +20,7 @@ public class Connection : MonoBehaviour
     this.gikoboxSend = onMessageReceived;
     this.onConnectionReady = onConnectionReady;
     string address = "ws://localhost:3000";
-    if (false){
+    if (true){
         address = "ws://gikobox.feor.org";
     }
     websocket = new WebSocket(address);

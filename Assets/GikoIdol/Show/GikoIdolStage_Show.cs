@@ -91,12 +91,14 @@ public class GikoIdolStage_Show : Stage
         // giving each player a chance to show dance/text
         foreach(Player p in this.game.players)
         {
+            sendEveryoneShow();
             this.currentPlayer = p;
             this.jumping = false;
             this.highlightCorrectNameplate(p);
             showIdol(p);
             yield return new WaitForSeconds(1.0f);
-            this.dispatchRightPage(p);
+            //this.dispatchRightPage(p);
+            this.game.loadNewPageSpecificPlayer("GikoIdolShow", p);
             int i = 0;
             foreach (string trait in this.game.playerData[p].traits){
                 setTrait(trait, i);
@@ -111,6 +113,12 @@ public class GikoIdolStage_Show : Stage
         this.game.loadNewPage("empty");
         this.game.nextStage();
         
+    }
+
+    public void sendEveryoneShow(){
+        foreach (Player p in this.game.players){
+            this.game.loadNewPageSpecificPlayer("GikoIdolShowSpectator", p);
+        }
     }
 
     public void dispatchRightPage(Player p){

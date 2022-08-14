@@ -31,6 +31,8 @@ public class GikoPlayer : MonoBehaviour
     public List<Sprite> sprites;
 
     public Sprite currentSprite;
+    private int shakeTween;
+    private bool shakable;
 
     public void setName(string newName)
     {
@@ -40,12 +42,16 @@ public class GikoPlayer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        shakable = true;
         LeanTween.scale(this.avatar.GetComponent<RectTransform>(), new Vector3(1.05f, 1.05f, 1.05f), 1.5f).setEase(LeanTweenType.easeInOutSine).setLoopPingPong();
     }
 
     public void shake(){
-        LeanTween.cancel(this.gameObject);
-        LeanTween.scale(this.gameObject, new Vector3(1.15f, 1.15f, 1.15f), 0.25f).setEaseShake();
+        if (shakable){
+            LeanTween.cancel(this.shakeTween);
+            shakable = false;
+            this.shakeTween = LeanTween.scale(this.gameObject, new Vector3(1.15f, 1.15f, 1.15f), 0.25f).setOnComplete(() => {shakable = true;}).setEaseShake().id;
+        }
     }
 
     public void addPrompt(){
